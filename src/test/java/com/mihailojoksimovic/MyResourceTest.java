@@ -8,7 +8,7 @@ import org.glassfish.jersey.test.JerseyTest;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
-import com.mihailojoksimovic.MyResource;
+import com.mihailojoksimovic.resource.MyResource;
 
 public class MyResourceTest extends JerseyTest {
 

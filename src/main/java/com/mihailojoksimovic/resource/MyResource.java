@@ -1,4 +1,4 @@
-package com.mihailojoksimovic;
+package com.mihailojoksimovic.resource;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
