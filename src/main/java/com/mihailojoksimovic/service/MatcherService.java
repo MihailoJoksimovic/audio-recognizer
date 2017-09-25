@@ -95,6 +95,7 @@ public class MatcherService {
                 }
 
                 distinctSongs.put(song, true);
+                times.put(song, time);
 
                 // Well we've got a match, so add it to matches hashmap
                 if (!matches.containsKey(song)) {
