@@ -2,7 +2,6 @@ package com.mihailojoksimovic.resource;
 
 
 import com.mihailojoksimovic.service.MatcherService;
-import com.mihailojoksimovic.util.MapUtil;
 
 import javax.json.*;
 import javax.ws.rs.*;

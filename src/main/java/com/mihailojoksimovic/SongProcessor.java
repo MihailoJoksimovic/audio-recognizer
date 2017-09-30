@@ -136,7 +136,7 @@ public class SongProcessor {
 
             short[] samples             = SamplesExtractor.getInstance().extractSamplesFromStream(din);
 
-            double[] fingerprints       = FingerprintExtractor.getInstance().extractFingerprints(samples, decodedFormat);
+            double[] fingerprints       = FingerprintExtractor.getInstance().extractFingerprints(samples, (int)decodedFormat.getSampleRate());
 
             if (commandLine.hasOption("write")) {
                 System.out.println("Storing fingerprints to DB");

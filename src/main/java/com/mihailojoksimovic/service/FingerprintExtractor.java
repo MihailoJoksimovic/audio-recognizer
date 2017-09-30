@@ -33,8 +33,8 @@ public class FingerprintExtractor
      * @param samples
      * @return
      */
-    public double[] extractFingerprints(short[] samples, AudioFormat audioFormat) {
-        final int WINDOW_SIZE           = largestPowerOf2((int)audioFormat.getSampleRate() / WINDOW_BUCKET_RATIO);
+    public double[] extractFingerprints(short[] samples, int sampleRate) {
+        final int WINDOW_SIZE           = largestPowerOf2(sampleRate / WINDOW_BUCKET_RATIO);
         final int HALF_WINDOW_SIZE      = WINDOW_SIZE / 2;
 
         HammingWindow windowingFunction = new HammingWindow(WINDOW_SIZE);
