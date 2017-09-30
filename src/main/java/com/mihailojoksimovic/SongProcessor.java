@@ -6,6 +6,7 @@ import com.mihailojoksimovic.service.MongoManager;
 import com.mihailojoksimovic.service.SamplesExtractor;
 import com.mongodb.MongoWriteException;
 import com.mongodb.client.MongoCollection;
+import org.apache.commons.cli.*;
 import org.bson.Document;
 
 import javax.sound.sampled.*;
@@ -31,24 +32,60 @@ public class SongProcessor {
             throw new Exception("Missing path to song or songs folder!");
         }
 
-        File file;
+        CommandLine commandLine;
+
+        Options options = new Options();
+
+        options.addOption("song", true, "[REQUIRED] File or Folder to be processed");
+        options.addOption("print", false, "Prints the fingerprints");
+        options.addOption("save", false, "If present, stores fingerprints to DB");
+
+//        Option song = OptionBuilder.create();
+//        song.setRequired(true);
+//        song.setLongOpt("song");
+//        song.setType(String.class);
+//        song.setDescription("Song name");
+//
+//        Option printFingerprints = OptionBuilder.create();
+//        printFingerprints.setRequired(false);
+//        printFingerprints.setLongOpt("print-fingerprint");
+//        printFingerprints.setDescription("If set to true, will print all fingerprints from song");
+//        printFingerprints.setType(Boolean.class);
+//
+//        Options options = new Options();
+//
+//        options.addOption(song);
+//        options.addOption(printFingerprints);
+
+        CommandLineParser parser = new GnuParser();
 
         try {
-            file = new File(args[0]);
+            commandLine = parser.parse(options, args);
+
+            if (!commandLine.hasOption("song")) {
+                // Print usage info
+                HelpFormatter formatter = new HelpFormatter();
+                formatter.printHelp("SongProcessor", options);
+
+                return;
+            }
+
+            File file = new File(commandLine.getOptionValue("song"));
+
+            SongProcessor sp = new SongProcessor();
+
+            sp.processFile(file, commandLine);
+        } catch (ParseException ex) {
+            System.out.println("Unable to parse command line arguments!");
+            ex.printStackTrace();
         } catch (NullPointerException ex) {
             throw new Exception("Invalid file path provided!");
         }
-
-        SongProcessor sp = new SongProcessor();
-
-        sp.processFile(file);
-
-        return;
     }
 
-    public void processFile(File file) {
+    public void processFile(File file, CommandLine commandLine) {
         if (file.isDirectory()) {
-            processDirectory(file);
+            processDirectory(file, commandLine);
 
             return;
         }
@@ -101,9 +138,21 @@ public class SongProcessor {
 
             double[] fingerprints       = FingerprintExtractor.getInstance().extractFingerprints(samples, decodedFormat);
 
-            MongoCollection collection  = MongoManager.getDatabase().getCollection(COLLECTION_NAME);
+            if (commandLine.hasOption("write")) {
+                System.out.println("Storing fingerprints to DB");
 
-            storeFingerprintsToDb(fingerprints, file, collection);
+                MongoCollection collection  = MongoManager.getDatabase().getCollection(COLLECTION_NAME);
+
+                storeFingerprintsToDb(fingerprints, file, collection);
+            }
+
+            if (commandLine.hasOption("print")) {
+                for (double d : fingerprints) {
+                    System.out.print((int)d+",");
+                }
+                System.out.println();
+            }
+
         } catch (CantExtractSamplesException ex) {
             System.out.println("I was unable to extract samples from "+file+" ! Skipping it ...");
 
@@ -112,10 +161,10 @@ public class SongProcessor {
 
     }
 
-    private void processDirectory(File directory) {
+    private void processDirectory(File directory, CommandLine commandLine) {
         for (File f : directory.listFiles()) {
             // Recurse me, baby!
-            processFile(f);
+            processFile(f, commandLine);
         }
     }
 
