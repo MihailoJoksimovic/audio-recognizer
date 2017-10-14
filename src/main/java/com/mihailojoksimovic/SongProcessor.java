@@ -1,9 +1,6 @@
 package com.mihailojoksimovic;
 
-import com.mihailojoksimovic.service.CantExtractSamplesException;
-import com.mihailojoksimovic.service.FingerprintExtractor;
-import com.mihailojoksimovic.service.MongoManager;
-import com.mihailojoksimovic.service.SamplesExtractor;
+import com.mihailojoksimovic.service.*;
 import com.mongodb.MongoWriteException;
 import com.mongodb.client.MongoCollection;
 import org.apache.commons.cli.*;
@@ -136,6 +133,37 @@ public class SongProcessor {
 
             short[] samples             = SamplesExtractor.getInstance().extractSamplesFromStream(din);
 
+            // Since samples extractor is actually converting to Mono, we need this
+            // new audio format in order to be able to play the data
+            AudioFormat resampledFormat = new AudioFormat(
+                    decodedFormat.getEncoding(),
+                    decodedFormat.getSampleRate(),
+                    decodedFormat.getSampleSizeInBits(),
+                    1,
+                    decodedFormat.getFrameSize() / 2,
+                    decodedFormat.getFrameRate() / 2,
+                    decodedFormat.isBigEndian()
+            );
+
+            int downsampleRate          = 11025;
+
+            short[] downsampledSamples  = DownsamplerService.getInstance().downSample((int) decodedFormat.getSampleRate(), downsampleRate, samples);
+
+            // Audio format after downsampling is done
+            AudioFormat downsampledFormat = new AudioFormat(
+                    decodedFormat.getEncoding(),
+                    downsampleRate,
+                    decodedFormat.getSampleSizeInBits(),
+                    1,
+                    decodedFormat.getFrameSize() / 2,
+                    decodedFormat.getFrameRate() / 2,
+                    decodedFormat.isBigEndian()
+            );
+
+            PlayerService.getInstance().play(downsampledSamples, downsampledFormat);
+
+            System.exit(0);
+
             double[] fingerprints       = FingerprintExtractor.getInstance().extractFingerprints(samples, (int)decodedFormat.getSampleRate());
 
             if (commandLine.hasOption("write")) {
@@ -155,6 +183,10 @@ public class SongProcessor {
 
         } catch (CantExtractSamplesException ex) {
             System.out.println("I was unable to extract samples from "+file+" ! Skipping it ...");
+
+            return;
+        } catch (LineUnavailableException ex) {
+            System.out.println("I was unable to reproduce (play) samples from "+file+" ! Skipping it ...");
 
             return;
         }
