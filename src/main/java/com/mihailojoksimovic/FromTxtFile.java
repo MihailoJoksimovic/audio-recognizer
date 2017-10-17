@@ -1,6 +1,10 @@
 package com.mihailojoksimovic;
 
+import com.mihailojoksimovic.model.Peak;
+import com.mihailojoksimovic.service.AudioCutter;
+import com.mihailojoksimovic.service.PeakExtractor;
 import com.mihailojoksimovic.service.PlayerService;
+import com.mihailojoksimovic.service.TimeToFrequencyDomainConverter;
 import sun.misc.IOUtils;
 
 import javax.sound.sampled.AudioFormat;
@@ -80,6 +84,23 @@ public class FromTxtFile {
 
             amplitudes[idx] = amp;
         }
+
+        amplitudes = AudioCutter.cutAudio(amplitudes, audioFormat, 0, 50);
+
+        double[][] timeFrequencyBins = TimeToFrequencyDomainConverter.getInstance().convertToFrequencyDomain(amplitudes, audioFormat, 25);
+
+        PeakExtractor peakExtractor = new PeakExtractor();
+
+        Peak[] peaks = peakExtractor.extractPeaks(timeFrequencyBins);
+
+        for (Peak p : peaks) {
+            if (p != null) {
+                System.out.println(p.getTimeBin()+"\t\t"+p.getFrequencyBin());
+            }
+
+        }
+
+
 
 
 

@@ -1,6 +1,9 @@
 package com.mihailojoksimovic;
 
+import com.mihailojoksimovic.model.Peak;
 import com.mihailojoksimovic.service.*;
+import com.mihailojoksimovic.service.windowing.HammingWindow;
+import com.mihailojoksimovic.service.windowing.WindowFunction;
 import com.mongodb.MongoWriteException;
 import com.mongodb.client.MongoCollection;
 import org.apache.commons.cli.*;
@@ -24,7 +27,7 @@ public class SongProcessor {
      */
     private final String COLLECTION_NAME                = "test";
 
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws NullPointerException, Exception{
         if (args.length < 1) {
             throw new Exception("Missing path to song or songs folder!");
         }
@@ -75,8 +78,6 @@ public class SongProcessor {
         } catch (ParseException ex) {
             System.out.println("Unable to parse command line arguments!");
             ex.printStackTrace();
-        } catch (NullPointerException ex) {
-            throw new Exception("Invalid file path provided!");
         }
     }
 
@@ -133,6 +134,9 @@ public class SongProcessor {
 
             short[] samples             = SamplesExtractor.getInstance().extractSamplesFromStream(din);
 
+            // Operate on a shortened version :-)
+            samples = AudioCutter.cutAudio(samples, decodedFormat, 9000, 2000);
+
             // Since samples extractor is actually converting to Mono, we need this
             // new audio format in order to be able to play the data
             AudioFormat resampledFormat = new AudioFormat(
@@ -145,24 +149,49 @@ public class SongProcessor {
                     decodedFormat.isBigEndian()
             );
 
-            int downsampleRate          = 11025;
+//            PlayerService.getInstance().play(samples, resampledFormat);
 
-            short[] downsampledSamples  = DownsamplerService.getInstance().downSample((int) decodedFormat.getSampleRate(), downsampleRate, samples);
+            final int downsampleRatio       = 4;    // How many times to downsample; for 44100 Hz, we're downsampling to 11025 Hz
+            final int downsampleTo          = (int) (resampledFormat.getSampleRate() / downsampleRatio); // Frequency to which to downsample
 
-            // Audio format after downsampling is done
-            AudioFormat downsampledFormat = new AudioFormat(
-                    decodedFormat.getEncoding(),
-                    downsampleRate,
-                    decodedFormat.getSampleSizeInBits(),
+            System.out.println("Downsampling from " +resampledFormat.getSampleRate()+" to "+downsampleTo);
+
+            // Downsample the signal now
+
+            AudioFormat downsampledFormat   = new AudioFormat(
+                    resampledFormat.getEncoding(),
+                    downsampleTo,
+                    resampledFormat.getSampleSizeInBits(),
                     1,
-                    decodedFormat.getFrameSize() / 2,
-                    decodedFormat.getFrameRate() / 2,
-                    decodedFormat.isBigEndian()
+                    resampledFormat.getFrameSize(),
+                    resampledFormat.getFrameRate(),
+                    resampledFormat.isBigEndian()
             );
+
+            short[] downsampledSamples = DownsamplerService.getInstance().downSample((int) resampledFormat.getSampleRate(), downsampleTo, samples);
+
+            // Extract time-frequency bins
+            double[][] timeFrequencyBins = TimeToFrequencyDomainConverter.getInstance().convertToFrequencyDomain(downsampledSamples, downsampledFormat, 25);
+
+            // Now, extract all peaks
+
+            PeakExtractor peakExtractor = new PeakExtractor();
+
+            // This is the array where first index is time index, and second array
+            // is array of frequency peaks categorized by indexes
+            Peak[] peaks = peakExtractor.extractPeaks(timeFrequencyBins);
+
+            for (Peak p : peaks) {
+                if (p != null) {
+                    System.out.println(p.getTimeBin()+" "+p.getFrequencyBin());
+                }
+
+            }
 
             PlayerService.getInstance().play(downsampledSamples, downsampledFormat);
 
             System.exit(0);
+
 
             double[] fingerprints       = FingerprintExtractor.getInstance().extractFingerprints(samples, (int)decodedFormat.getSampleRate());
 

@@ -1,8 +1,6 @@
 package com.mihailojoksimovic.resource;
 
-
 import com.mihailojoksimovic.service.MatcherService;
-
 import javax.json.*;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;

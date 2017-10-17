@@ -28,8 +28,6 @@ public class MatcherService {
             instance = new MatcherService();
         }
 
-
-
         return instance;
     }
 
@@ -104,7 +102,7 @@ public class MatcherService {
 
                 int hits    = matches.get(song);
 
-                System.out.println("Increasing hits for song "+song+" to "+hits);
+                System.out.println("Increasing hits for song "+song+" to "+hits+"; hit found for hash "+hash+", "+nextHash+" at time "+time);
 
                 matches.put(song, ++hits);
             }
