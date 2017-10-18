@@ -1,10 +1,8 @@
 package com.mihailojoksimovic;
 
 import com.mihailojoksimovic.model.Peak;
-import com.mihailojoksimovic.service.AudioCutter;
-import com.mihailojoksimovic.service.PeakExtractor;
-import com.mihailojoksimovic.service.PlayerService;
-import com.mihailojoksimovic.service.TimeToFrequencyDomainConverter;
+import com.mihailojoksimovic.model.Point;
+import com.mihailojoksimovic.service.*;
 import sun.misc.IOUtils;
 
 import javax.sound.sampled.AudioFormat;
@@ -93,14 +91,18 @@ public class FromTxtFile {
 
         Peak[] peaks = peakExtractor.extractPeaks(timeFrequencyBins);
 
-        for (Peak p : peaks) {
-            if (p != null) {
-                System.out.println(p.getTimeBin()+"\t\t"+p.getFrequencyBin());
-            }
+//        for (Peak p : peaks) {
+//            if (p != null) {
+//                System.out.println(p.getTimeBin()+"\t\t"+p.getFrequencyBin());
+//            }
+//
+//        }
 
-        }
+        Point[] points = PointsFromPeaksCreator.makePointsFromPeaks(peaks, 3);
 
+        // Now query the DB nigga!
 
+        MongoService.findMatches(points);
 
 
 

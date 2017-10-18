@@ -1,6 +1,7 @@
 package com.mihailojoksimovic;
 
 import com.mihailojoksimovic.model.Peak;
+import com.mihailojoksimovic.model.Point;
 import com.mihailojoksimovic.service.*;
 import com.mihailojoksimovic.service.windowing.HammingWindow;
 import com.mihailojoksimovic.service.windowing.WindowFunction;
@@ -181,12 +182,15 @@ public class SongProcessor {
             // is array of frequency peaks categorized by indexes
             Peak[] peaks = peakExtractor.extractPeaks(timeFrequencyBins);
 
-            for (Peak p : peaks) {
-                if (p != null) {
-                    System.out.println(p.getTimeBin()+" "+p.getFrequencyBin());
-                }
+            // Get data points
 
+            Point[] points = PointsFromPeaksCreator.makePointsFromPeaks(peaks, 3);
+
+            for (Point p : points) {
+                p.setSong(file.getName());
             }
+
+            MongoService.storeToMongo(points);
 
             PlayerService.getInstance().play(downsampledSamples, downsampledFormat);
 
