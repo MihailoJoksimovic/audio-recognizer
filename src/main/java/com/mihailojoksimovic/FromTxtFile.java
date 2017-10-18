@@ -11,6 +11,9 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Scanner;
 
 /**
@@ -83,7 +86,7 @@ public class FromTxtFile {
             amplitudes[idx] = amp;
         }
 
-        amplitudes = AudioCutter.cutAudio(amplitudes, audioFormat, 0, 50);
+//        amplitudes = AudioCutter.cutAudio(amplitudes, audioFormat, 0, 50);
 
         double[][] timeFrequencyBins = TimeToFrequencyDomainConverter.getInstance().convertToFrequencyDomain(amplitudes, audioFormat, 25);
 
@@ -102,7 +105,18 @@ public class FromTxtFile {
 
         // Now query the DB nigga!
 
-        MongoService.findMatches(points);
+        HashMap<String, Integer> matches = MongoService.findMatches(points);
+
+
+        Iterator<HashMap.Entry<String,Integer>> it = matches.entrySet().iterator();
+
+        while (it.hasNext()) {
+            Map.Entry entry = it.next();
+
+            System.out.println(entry.getKey() + ": " + entry.getValue()+" matches");
+        }
+
+
 
 
 
@@ -110,6 +124,6 @@ public class FromTxtFile {
 
 //        short[] data = shortBuffer.array();
 
-        PlayerService.getInstance().play(amplitudes, audioFormat);
+//        PlayerService.getInstance().play(amplitudes, audioFormat);
     }
 }

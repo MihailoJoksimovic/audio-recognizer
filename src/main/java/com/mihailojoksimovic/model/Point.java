@@ -7,11 +7,13 @@ public class Point
     private Peak peak2;
     private int deltaTimebin;
     private String song;
+    private int timeBin;
 
-    public Point(Peak peak1, Peak peak2, int deltaTimebin) {
+    public Point(Peak peak1, Peak peak2, int deltaTimebin, int timeBin) {
         this.peak1 = peak1;
         this.peak2 = peak2;
         this.deltaTimebin = deltaTimebin;
+        this.timeBin = timeBin;
     }
 
     public Point(Peak peak1, Peak peak2, int deltaTimebin, String song) {
@@ -51,5 +53,13 @@ public class Point
 
     public void setSong(String song) {
         this.song = song;
+    }
+
+    public int getTimeBin() {
+        return timeBin;
+    }
+
+    public void setTimeBin(int timeBin) {
+        this.timeBin = timeBin;
     }
 }

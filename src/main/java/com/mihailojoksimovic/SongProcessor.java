@@ -192,37 +192,38 @@ public class SongProcessor {
 
             MongoService.storeToMongo(points);
 
-            PlayerService.getInstance().play(downsampledSamples, downsampledFormat);
+//            PlayerService.getInstance().play(downsampledSamples, downsampledFormat);
+//
+//            System.exit(0);
 
-            System.exit(0);
 
-
-            double[] fingerprints       = FingerprintExtractor.getInstance().extractFingerprints(samples, (int)decodedFormat.getSampleRate());
-
-            if (commandLine.hasOption("write")) {
-                System.out.println("Storing fingerprints to DB");
-
-                MongoCollection collection  = MongoManager.getDatabase().getCollection(COLLECTION_NAME);
-
-                storeFingerprintsToDb(fingerprints, file, collection);
-            }
-
-            if (commandLine.hasOption("print")) {
-                for (double d : fingerprints) {
-                    System.out.print((int)d+",");
-                }
-                System.out.println();
-            }
+//            double[] fingerprints       = FingerprintExtractor.getInstance().extractFingerprints(samples, (int)decodedFormat.getSampleRate());
+//
+//            if (commandLine.hasOption("write")) {
+//                System.out.println("Storing fingerprints to DB");
+//
+//                MongoCollection collection  = MongoManager.getDatabase().getCollection(COLLECTION_NAME);
+//
+//                storeFingerprintsToDb(fingerprints, file, collection);
+//            }
+//
+//            if (commandLine.hasOption("print")) {
+//                for (double d : fingerprints) {
+//                    System.out.print((int)d+",");
+//                }
+//                System.out.println();
+//            }
 
         } catch (CantExtractSamplesException ex) {
-            System.out.println("I was unable to extract samples from "+file+" ! Skipping it ...");
-
-            return;
-        } catch (LineUnavailableException ex) {
-            System.out.println("I was unable to reproduce (play) samples from "+file+" ! Skipping it ...");
+            System.out.println("I was unable to extract samples from " + file + " ! Skipping it ...");
 
             return;
         }
+//        } catch (LineUnavailableException ex) {
+//            System.out.println("I was unable to reproduce (play) samples from "+file+" ! Skipping it ...");
+//
+//            return;
+//        }
 
     }
 

@@ -46,7 +46,7 @@ public class PointsFromPeaksCreator {
                     break;
                 }
 
-                Point point         = new Point(peak1, peak2, deltaTimebin);
+                Point point         = new Point(peak1, peak2, deltaTimebin, i);
 
                 points[counter++]   = point;
             }

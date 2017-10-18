@@ -1,6 +1,7 @@
 package com.mihailojoksimovic.service;
 
 import com.mihailojoksimovic.model.Point;
+import com.mongodb.MongoException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Filters;
@@ -22,13 +23,19 @@ public class MongoService {
             doc.put("point_a",      p.getPeak1().getFrequencyBin());
             doc.put("point_b",      p.getPeak2().getFrequencyBin());
             doc.put("delta_time",   p.getDeltaTimebin());
+            doc.put("timebin",      p.getTimeBin());
             doc.put("song",         p.getSong());
 
-            mongoCollection.insertOne(doc);
+            try {
+                mongoCollection.insertOne(doc);
+            } catch (MongoException ex) {
+                // Who cares ...
+            }
+
         }
     }
 
-    public static String[] findMatches(Point[] points) {
+    public static HashMap<String,Integer> findMatches(Point[] points) {
         int matches = 0;
 
         HashMap<String, Integer> results = new HashMap<>();
@@ -65,8 +72,6 @@ public class MongoService {
             }
         }
 
-
-
-        return new String[]{"Kita"};
+        return results;
     }
 }
