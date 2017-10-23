@@ -110,6 +110,8 @@ public class MongoService {
             }
         }
 
+        System.out.println("Best match seems to be: " + highestSong);
+
         return results;
     }
 }

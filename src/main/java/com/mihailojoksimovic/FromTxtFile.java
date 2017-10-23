@@ -21,7 +21,8 @@ import java.util.Scanner;
  */
 public class FromTxtFile {
     public static void main(String[] args) throws FileNotFoundException, LineUnavailableException, IOException {
-        String file = "/Users/mihailojoksimovic/Downloads/vlado-10s.pcm";
+//        String file = "/Users/mihailojoksimovic/Downloads/vlado-andjele2.pcm";
+        String file = "/Users/mihailojoksimovic/Downloads/metallica-fight-fire-with-fire.pcm";
 
         File file1 = new File(file);
 
