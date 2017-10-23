@@ -27,8 +27,14 @@ public class PeakExtractor {
 
             System.out.println("Average amplitude is: "+avgAmplitude);
 
-            double[] maxAmplitudes      = new double[RANGE.length];
-            int[] maxFreqs              = new int[RANGE.length];
+            // Just find highest freq
+
+            int highestFreq         = 0;
+            double highestAmplitude    = 0;
+
+
+//            double[] maxAmplitudes      = new double[RANGE.length];
+//            int[] maxFreqs              = new int[RANGE.length];
 
             // Find highest freqs in ranges
             for (int j = 0; j < frequencyBins.length; j++) {
@@ -36,19 +42,26 @@ public class PeakExtractor {
                     continue;
                 }
 
-                int index   = getIndex(j);
-
-                if (frequencyBins[j] > maxAmplitudes[index]) {
-                    maxAmplitudes[index]    = frequencyBins[j];
-                    maxFreqs[index]         = j;
+                if (frequencyBins[j] > highestAmplitude) {
+                    highestAmplitude    = frequencyBins[j];
+                    highestFreq         = j;
                 }
+
+//                int index   = getIndex(j);
+//
+//                if (frequencyBins[j] > maxAmplitudes[index]) {
+//                    maxAmplitudes[index]    = frequencyBins[j];
+//                    maxFreqs[index]         = j;
+//                }
             }
 
-            for (int j = 0; j < maxFreqs.length; j++) {
-                if (maxFreqs[j] > 0) {
-                    results[counter++]  = new Peak(maxFreqs[j], i);
-                }
-            }
+            results[counter++]  = new Peak(highestFreq, i);
+
+//            for (int j = 0; j < maxFreqs.length; j++) {
+//                if (maxFreqs[j] > 0) {
+//                    results[counter++]  = new Peak(maxFreqs[j], i);
+//                }
+//            }
         }
 
         return results;
