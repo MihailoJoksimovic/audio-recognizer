@@ -50,6 +50,10 @@ public class MongoService {
         for (Point p : points) {
 
             try {
+                if (p.getPeak1().getFrequencyBin() == p.getPeak2().getFrequencyBin()) {
+                    continue;
+                }
+
                 MongoCursor<Document> cursor = mongoCollection.find(Filters.and(
                         Filters.eq("point_a",       p.getPeak1().getFrequencyBin()),
                         Filters.eq("point_b",       p.getPeak2().getFrequencyBin()),
@@ -110,7 +114,25 @@ public class MongoService {
             }
         }
 
-        System.out.println("Best match seems to be: " + highestSong);
+        System.out.println("Time-wise best match seems to be: " + highestSong);
+
+        Iterator it2    = results.entrySet().iterator();
+
+        highestSong  = null;
+        highestMatches  = 0;
+
+        while (it2.hasNext()) {
+            Map.Entry<String, Integer> pair = (Map.Entry)it2.next();
+
+            if (pair.getValue() > highestMatches) {
+                highestMatches  = pair.getValue();
+                highestSong     = pair.getKey();
+            }
+        }
+
+        System.out.println("Point-wise best match seems to be: " + highestSong);
+
+        System.out.println("\n\n\n");
 
         return results;
     }

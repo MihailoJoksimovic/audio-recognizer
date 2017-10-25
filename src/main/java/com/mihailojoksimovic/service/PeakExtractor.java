@@ -37,7 +37,7 @@ public class PeakExtractor {
 //            int[] maxFreqs              = new int[RANGE.length];
 
             // Find highest freqs in ranges
-            for (int j = 0; j < frequencyBins.length; j++) {
+            for (int j = LOWER_RANGE; j < frequencyBins.length; j++) {
                 if (frequencyBins[j] < avgAmplitude) {
                     continue;
                 }
